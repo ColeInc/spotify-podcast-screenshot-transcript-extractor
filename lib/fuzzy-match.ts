@@ -2,6 +2,7 @@ import Fuse from "fuse.js";
 import { SpotifyEpisode, EpisodeMatch } from "@/types/spotify";
 
 const CONFIDENCE_THRESHOLD = 0.3; // Lower score = better match
+const CONFIDENCE_THRESHOLD_2 = 0.6; // Lower score = better match
 
 export function findBestEpisodeMatch(
   episodes: SpotifyEpisode[],
