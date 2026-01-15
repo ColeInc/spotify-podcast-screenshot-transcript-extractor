@@ -24,16 +24,17 @@ body {
 }
 
 .ascii-text {
-    color: #00bfff;
-    font-size: 2vw;
-    line-height: 2vw;
-    letter-spacing: 0.1vw;
+    color: #1eb0f4;
+    font-size: 1.3vw;
+    line-height: 1.35vw;
+    letter-spacing: 0;
     font-weight: 700;
     z-index: 1;
     position: relative;
     white-space: pre;
     text-align: center;
-    width: 80vw;
+    width: 95vw;
+    font-family: 'Courier New', 'Courier', monospace;
 }
 
 .gradient-overlay {
