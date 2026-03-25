@@ -1,0 +1,83 @@
+// Prisma schema for Screenshot Transcript Extractor
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Screenshot {
+  id            String   @id @default(cuid())
+  filename      String
+  filepath      String
+  uploadedAt    DateTime @default(now())
+  status        String   @default("pending") // pending, processing, completed, failed
+
+  // Extracted data from Claude Vision API
+  platform      String?  // "spotify" or "youtube"
+  videoId       String?
+  videoTitle    String?
+  timestamp     Int?     // timestamp in seconds
+  confidence    String?  // high, medium, low
+
+  video         Video?   @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([status])
+}
+
+model Video {
+  id            String   @id @default(cuid())
+  title         String
+  platform      String   // "spotify" or "youtube"
+  createdAt     DateTime @default(now())
+
+  screenshots   Screenshot[]
+  recordings    Recording[]
+  transcript    Transcript?
+
+  @@unique([title, platform])
+}
+
+model Recording {
+  id            String   @id @default(cuid())
+  videoId       String
+  timestamp     Int      // target timestamp in seconds
+  videoPath     String   // path to .webm recording
+  audioPath     String?  // path to extracted .mp3
+  duration      Int      @default(120) // 120 seconds (2 minutes)
+  status        String   @default("pending") // pending, recording, extracting, completed, failed
+  createdAt     DateTime @default(now())
+
+  video         Video    @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([status])
+}
+
+model Transcript {
+  id            String   @id @default(cuid())
+  videoId       String   @unique
+  content       String   @db.Text
+  markdownPath  String   // path to .md file
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  video         Video    @relation(fields: [videoId], references: [id])
+}
+
+model AutomationJob {
+  id              String   @id @default(cuid())
+  status          String   @default("queued") // queued, running, completed, failed
+  totalItems      Int
+  completedItems  Int      @default(0)
+  currentVideo    String?
+  currentTimestamp Int?
+  errors          Json?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+}
